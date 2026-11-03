@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "NYC City Guide"
+description = "A beginner-friendly, mobile-ready single-page guide to New York City, featuring its food, facts, current leadership, state bird, and a personal likes list."
+version = "1.0.0"
+id = "artifacts/nyc-guide"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21936
+
+[services.development]
+run = "pnpm --filter @workspace/nyc-guide run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/nyc-guide", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/nyc-guide/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21936"
+BASE_PATH = "/"

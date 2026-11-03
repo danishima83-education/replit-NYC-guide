@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A little field guide to New York City: its food, facts, people, and favorite things."
+    />
+    <meta name="theme-color" content="#f4efe5" />
+    <title>New York, Up Close — A City Guide</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the guide</a>
+    <header class="masthead">
+      <a class="wordmark" href="#top" aria-label="New York, Up Close home">
+        <span class="wordmark-mark" aria-hidden="true">NY</span>
+        <span>FIELD NOTES <span class="wordmark-divider">/</span> NEW YORK</span>
+      </a>
+      <nav class="top-nav" aria-label="Main navigation">
+        <a href="#taste">Taste</a>
+        <a href="#know">Know</a>
+        <a href="#favorites">Your list</a>
+      </nav>
+      <span class="edition">A LOCAL’S LITTLE GUIDE <span>NO. 01</span></span>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-line"></span> THE CITY, IN A FEW GOOD DETAILS</p>
+          <h1 id="hero-title">New York,<br /><em>up close.</em></h1>
+          <p class="hero-intro">
+            A pocket-sized introduction to the place that never quite sits still.
+            Start with a slice, stay for the small things.
+          </p>
+          <a class="text-link" href="#taste">Take a little look <span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="hero-art" role="img" aria-label="Abstract illustration of New York buildings and a sunny city block">
+          <div class="sun-disc"></div>
+          <div class="skyline skyline-back" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="skyline skyline-front" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div class="street-band" aria-hidden="true"></div>
+          <span class="art-caption">40° 42′ 46″ N<br />74° 00′ 21″ W</span>
+          <span class="hero-stamp" aria-hidden="true">THE<br />CITY<br /><b>IS YOURS</b></span>
+        </div>
+        <div class="hero-index" aria-hidden="true"><span>01</span> / 04</div>
+      </section>
+
+      <div class="section-ribbon" aria-label="New York City, five boroughs">
+        <span>MANHATTAN</span><i></i><span>THE BRONX</span><i></i><span>QUEENS</span><i></i><span>BROOKLYN</span><i></i><span>STATEN ISLAND</span>
+      </div>
+
+      <section class="feature-section" id="taste" aria-labelledby="food-title">
+        <div class="section-heading">
+          <p class="eyebrow"><span class="section-number">01</span> THE FIRST BITE</p>
+          <h2 id="food-title">A city served<br />by the slice.</h2>
+          <p class="section-deck">
+            Around here, a meal can be folded in half and eaten on the move.
+          </p>
+        </div>
+        <article class="food-feature">
+          <div class="food-image-wrap">
+            <img
+              class="pizza-image"
+              src="images/nyc-pizza.png"
+              alt="A classic New York-style pizza slice with a thin, foldable crust and bubbling cheese"
+              width="900"
+              height="680"
+            />
+            <span class="image-note">THE NEW YORK SLICE</span>
+          </div>
+          <div class="food-copy">
+            <p class="small-label">ON THE COUNTER</p>
+            <h3>Hot, fast,<br /><em>and folded.</em></h3>
+            <p>
+              New York-style pizza is all about a wide, hand-tossed crust: thin
+              enough to fold, sturdy enough to carry, and best eaten straight
+              from the paper plate. A little char around the edge is part of the
+              story.
+            </p>
+            <div class="food-meta">
+              <span>ORDER IT</span>
+              <span>By the slice, please.</span>
+            </div>
+            <span class="scribble" aria-hidden="true">one more?</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="city-facts" id="know" aria-labelledby="facts-title">
+        <div class="facts-intro">
+          <p class="eyebrow"><span class="section-number">02</span> THE QUICK READ</p>
+          <h2 id="facts-title">A few things<br />to know.</h2>
+          <p>Big city, useful context. Keep these in your back pocket.</p>
+        </div>
+        <ul class="facts-list">
+          <li>
+            <span class="fact-index">01</span>
+            <span class="fact-label">NICKNAME</span>
+            <strong>The Big Apple</strong>
+          </li>
+          <li>
+            <span class="fact-index">02</span>
+            <span class="fact-label">POPULATION</span>
+            <strong>8,804,190 <small>people</small></strong>
+            <span class="fact-footnote">2020 Census</span>
+          </li>
+          <li>
+            <span class="fact-index">03</span>
+            <span class="fact-label">STATEHOOD</span>
+            <strong>1788</strong>
+            <span class="fact-footnote">New York joined the Union</span>
+          </li>
+        </ul>
+        <div class="borough-mark" aria-hidden="true">
+          <span>5</span><small>BOROUGHS<br />ONE CITY</small>
+        </div>
+      </section>
+
+      <section class="people-section" aria-label="City people and nature">
+        <article class="mayor-note">
+          <div class="note-topline"><span>AT CITY HALL</span><span>01 / PEOPLE</span></div>
+          <div class="mayor-monogram" aria-hidden="true">ZM</div>
+          <p class="eyebrow">THE CITY’S MAYOR</p>
+          <h2>Zohran<br /><em>Mamdani</em></h2>
+          <p class="role-label">Mayor of New York City</p>
+          <span class="note-rule"></span>
+          <p class="note-caption">A city is its people—and the people who show up for them.</p>
+        </article>
+
+        <article class="bird-feature">
+          <div class="bird-copy">
+            <p class="eyebrow"><span class="section-number">03</span> A WILD LITTLE DETAIL</p>
+            <h2>Look up.<br /><em>Look closer.</em></h2>
+            <p>
+              The Eastern bluebird is New York State’s bird. Tap or focus the
+              picture and press Enter or Space to give it a little shake.
+            </p>
+            <span class="bird-label">STATE BIRD <b>Eastern bluebird</b></span>
+          </div>
+          <div class="bird-image-frame">
+            <img
+              class="bird"
+              src="images/eastern-bluebird.png"
+              alt="An Eastern bluebird perched on a branch, its plumage bright blue and warm rust"
+              width="720"
+              height="760"
+              tabindex="0"
+              role="button"
+              aria-label="Eastern bluebird. Activate to make the picture shake."
+              title="Give the bluebird a shake"
+            />
+            <span class="bird-image-caption">SIALIA SIALIS <span>·</span> NEW YORK STATE BIRD</span>
+            <span class="bird-ring" aria-hidden="true"></span>
+          </div>
+        </article>
+      </section>
+
+      <section class="favorites-section" id="favorites" aria-labelledby="favorites-title">
+        <div class="favorites-heading">
+          <p class="eyebrow"><span class="section-number">04</span> YOUR SIDE OF THE STORY</p>
+          <h2 id="favorites-title">Things I <em>like.</em></h2>
+          <p>Make this guide yours. Add a place, a moment, or a good idea for later.</p>
+        </div>
+        <form class="favorite-form" id="favorite-form">
+          <label for="favorite-input">Something you like about New York</label>
+          <div class="input-row">
+            <input
+              id="favorite-input"
+              name="favorite"
+              type="text"
+              placeholder="A late-night walk, a little bookstore…"
+              autocomplete="off"
+              maxlength="120"
+            />
+            <button type="submit">Add to my list <span aria-hidden="true">+</span></button>
+          </div>
+          <p class="form-hint" id="form-hint" aria-live="polite">Your list stays right here while this page is open.</p>
+        </form>
+        <ul class="favorites-list" id="favorites-list" aria-label="Things I like" aria-live="polite">
+          <li class="list-empty" id="list-empty">
+            <span class="empty-mark" aria-hidden="true">+</span>
+            <span>Your list is waiting for its first entry.</span>
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="wordmark footer-wordmark" href="#top">
+        <span class="wordmark-mark" aria-hidden="true">NY</span>
+        <span>FIELD NOTES <span class="wordmark-divider">/</span> NEW YORK</span>
+      </a>
+      <p>Made for curious people, one city detail at a time.</p>
+      <a class="back-top" href="#top">BACK TO TOP <span aria-hidden="true">↑</span></a>
+    </footer>
+  </body>
+</html>
