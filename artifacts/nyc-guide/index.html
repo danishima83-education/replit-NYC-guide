@@ -7,13 +7,13 @@
       name="description"
       content="A little field guide to New York City: its food, facts, people, and favorite things."
     />
-    <meta name="theme-color" content="#f4efe5" />
+    <meta name="theme-color" content="#d90070" />
     <title>New York, Up Close — A City Guide</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
@@ -37,32 +37,53 @@
     <main id="main">
       <section class="hero" id="top" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-line"></span> THE CITY, IN A FEW GOOD DETAILS</p>
-          <h1 id="hero-title">New York,<br /><em>up close.</em></h1>
+          <p class="eyebrow"><span class="eyebrow-line"></span> FIVE BOROUGHS. ONE BIG FEELING.</p>
+          <h1 id="hero-title">New York<br /><em>city guide</em></h1>
           <p class="hero-intro">
             A pocket-sized introduction to the place that never quite sits still.
             Start with a slice, stay for the small things.
           </p>
-          <a class="text-link" href="#taste">Take a little look <span aria-hidden="true">↓</span></a>
+          <a class="text-link" href="#explore">Find your first stop <span aria-hidden="true">↓</span></a>
         </div>
-        <div class="hero-art" role="img" aria-label="Abstract illustration of New York buildings and a sunny city block">
-          <div class="sun-disc"></div>
-          <div class="skyline skyline-back" aria-hidden="true">
-            <span></span><span></span><span></span><span></span><span></span>
-          </div>
-          <div class="skyline skyline-front" aria-hidden="true">
-            <span></span><span></span><span></span><span></span>
-          </div>
-          <div class="street-band" aria-hidden="true"></div>
-          <span class="art-caption">40° 42′ 46″ N<br />74° 00′ 21″ W</span>
-          <span class="hero-stamp" aria-hidden="true">THE<br />CITY<br /><b>IS YOURS</b></span>
+        <div class="hero-art" aria-hidden="true">
+          <img src="images/nyc-skyline.png" alt="" />
         </div>
+        <div class="hero-stamp" aria-hidden="true">NEW YORK<br /><b>MADE OF<br />MOMENTS</b></div>
+        <span class="art-caption" aria-hidden="true">40° 42′ 46″ N<br />74° 00′ 21″ W</span>
         <div class="hero-index" aria-hidden="true"><span>01</span> / 04</div>
       </section>
 
       <div class="section-ribbon" aria-label="New York City, five boroughs">
         <span>MANHATTAN</span><i></i><span>THE BRONX</span><i></i><span>QUEENS</span><i></i><span>BROOKLYN</span><i></i><span>STATEN ISLAND</span>
       </div>
+
+      <section class="quick-links" id="explore" aria-labelledby="explore-title">
+        <div class="quick-links-head">
+          <div>
+            <p class="eyebrow">A GOOD PLACE TO BEGIN</p>
+            <h2 id="explore-title">Pick a direction.</h2>
+          </div>
+          <p class="quick-note">Small details. Big-city stories.</p>
+        </div>
+        <nav class="tile-grid" aria-label="Explore the guide">
+          <a class="guide-tile" href="#taste">
+            <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M5 21h22l-2 5H8l-3-5Z"/><path d="M7 20a9 9 0 0 1 18 0M12 15l2 2m6-2-2 2M16 12v2"/></svg></span>
+            <span class="tile-title"><span>Eat a slice</span><span aria-hidden="true">↗</span></span>
+          </a>
+          <a class="guide-tile" href="#know">
+            <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 4 27 10v12l-11 6-11-6V10l11-6Z"/><path d="m5 10 11 6 11-6M16 16v12M11 7l11 6"/></svg></span>
+            <span class="tile-title"><span>Know the city</span><span aria-hidden="true">↗</span></span>
+          </a>
+          <a class="guide-tile" href="#people">
+            <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="12" cy="11" r="4"/><path d="M4 26v-2a8 8 0 0 1 16 0v2H4Zm16-17a4 4 0 0 1 0 8m2 3a7 7 0 0 1 6 6"/></svg></span>
+            <span class="tile-title"><span>Meet the locals</span><span aria-hidden="true">↗</span></span>
+          </a>
+          <a class="guide-tile" href="#favorites">
+            <span class="tile-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 27S5 20 5 12a6 6 0 0 1 11-3 6 6 0 0 1 11 3c0 8-11 15-11 15Z"/><path d="M10 16h4l2-4 3 8 2-4h2"/></svg></span>
+            <span class="tile-title"><span>Make your list</span><span aria-hidden="true">↗</span></span>
+          </a>
+        </nav>
+      </section>
 
       <section class="feature-section" id="taste" aria-labelledby="food-title">
         <div class="section-heading">
@@ -131,7 +152,7 @@
         </div>
       </section>
 
-      <section class="people-section" aria-label="City people and nature">
+      <section class="people-section" id="people" aria-label="City people and nature">
         <article class="mayor-note">
           <div class="note-topline"><span>AT CITY HALL</span><span>01 / PEOPLE</span></div>
           <div class="mayor-monogram" aria-hidden="true">ZM</div>
