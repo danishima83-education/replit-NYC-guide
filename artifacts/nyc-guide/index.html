@@ -29,6 +29,7 @@
       <nav class="top-nav" aria-label="Main navigation">
         <a href="#taste">Taste</a>
         <a href="#know">Know</a>
+        <a href="#chat">Ask a local</a>
         <a href="#favorites">Your list</a>
       </nav>
       <span class="edition">A LOCAL’S LITTLE GUIDE <span>NO. 01</span></span>
@@ -218,6 +219,89 @@
             <span>Your list is waiting for its first entry.</span>
           </li>
         </ul>
+      </section>
+
+      <section class="chat-section" id="chat" aria-labelledby="chat-title">
+        <div class="chat-intro">
+          <p class="eyebrow"><span class="section-number">05</span> A FRIENDLY LOCAL, ON CALL</p>
+          <h2 id="chat-title">Ask a <em>local.</em></h2>
+          <p>
+            Wondering what to eat, where to wander, or what makes this city
+            tick? Ask away. Your guide keeps it kind, short, and New York.
+          </p>
+          <span class="chat-fact-note">Answers are guided by the city facts above.</span>
+        </div>
+
+        <div class="chat-card">
+          <div class="chat-card-top">
+            <span>NYC FIELD GUIDE</span>
+            <span><i aria-hidden="true"></i> CITY GUIDE ONLINE</span>
+          </div>
+
+          <div
+            class="chat-messages"
+            id="chat-messages"
+            role="log"
+            aria-label="Conversation with the NYC city guide"
+            aria-live="polite"
+            aria-relevant="additions"
+          >
+            <article class="chat-message assistant-message">
+              <div class="chat-message-head"><span>YOUR LOCAL GUIDE</span></div>
+              <p>Hey there. Ask me about a New York bite, a city fact, or a good way to explore.</p>
+            </article>
+          </div>
+
+          <form class="chat-form" id="chat-form">
+            <label for="chat-input">What would you like to know?</label>
+            <div class="chat-compose">
+              <textarea
+                id="chat-input"
+                name="message"
+                rows="2"
+                maxlength="2000"
+                placeholder="What should I eat first?"
+                required
+              ></textarea>
+              <button id="chat-submit" type="submit">
+                Ask the guide <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+            <p class="chat-status" id="chat-status" aria-live="polite">
+              Keep it local. Please don’t include personal information.
+            </p>
+          </form>
+
+          <section class="prompt-lab" aria-labelledby="prompt-lab-title">
+            <div class="prompt-lab-heading">
+              <div>
+                <p class="small-label">TUNE THE GUIDE</p>
+                <h3 id="prompt-lab-title">Prompt Lab</h3>
+              </div>
+              <span class="prompt-lab-note">These settings apply to your next question.</span>
+            </div>
+
+            <div class="prompt-controls">
+              <label class="prompt-control" for="temperature">
+                <span>Temperature <output id="temperature-value" for="temperature">1.0</output></span>
+                <input id="temperature" name="temperature" type="range" min="0" max="2" step="0.1" value="1" />
+              </label>
+              <label class="prompt-control" for="max-tokens">
+                <span>Max output tokens <output id="max-tokens-value" for="max-tokens">300</output></span>
+                <input id="max-tokens" name="maxOutputTokens" type="range" min="32" max="1024" step="1" value="300" />
+              </label>
+              <label class="prompt-control" for="top-p">
+                <span>Top-p <output id="top-p-value" for="top-p">0.95</output></span>
+                <input id="top-p" name="topP" type="range" min="0" max="1" step="0.01" value="0.95" />
+              </label>
+            </div>
+
+            <details class="prompt-details">
+              <summary>Show the system prompt</summary>
+              <pre id="system-prompt-text">Loading the city guide prompt…</pre>
+            </details>
+          </section>
+        </div>
       </section>
     </main>
 

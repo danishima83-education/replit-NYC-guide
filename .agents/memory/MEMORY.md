@@ -1,0 +1,1 @@
+- [Direct Gemini model availability](direct-gemini-model-availability.md) — the old Flash model was retired for this key; the recommended replacement returned temporary high-demand errors.

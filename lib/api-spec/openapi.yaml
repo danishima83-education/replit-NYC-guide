@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: chat
+    description: NYC city guide chat
 paths:
   /healthz:
     get:
@@ -24,6 +26,42 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /chat:
+    post:
+      operationId: sendChatMessage
+      tags: [chat]
+      summary: Ask the NYC city guide a question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequestInput"
+      responses:
+        "200":
+          description: The city guide's answer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+        "400":
+          description: Invalid chat request
+        "502":
+          description: The AI provider could not answer
+        "503":
+          description: The Gemini key is missing or the provider is temporarily unavailable
+  /chat/system-prompt:
+    get:
+      operationId: getChatSystemPrompt
+      tags: [chat]
+      summary: Get the city guide system prompt
+      responses:
+        "200":
+          description: The prompt used by the city guide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemPromptResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +71,87 @@ components:
           type: string
       required:
         - status
+    ChatHistoryMessage:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+      required: [role, content]
+    ChatSettingsInput:
+      type: object
+      properties:
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+        topP:
+          type: number
+          minimum: 0
+          maximum: 1
+        maxOutputTokens:
+          type: integer
+          minimum: 32
+          maximum: 1024
+    ChatRequestInput:
+      type: object
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        history:
+          type: array
+          maxItems: 24
+          items:
+            $ref: "#/components/schemas/ChatHistoryMessage"
+        settings:
+          $ref: "#/components/schemas/ChatSettingsInput"
+      required: [message]
+    ChatUsage:
+      type: object
+      properties:
+        promptTokens:
+          type: integer
+        outputTokens:
+          type: integer
+        totalTokens:
+          type: integer
+        finishReason:
+          type: [string, "null"]
+      required: [promptTokens, outputTokens, totalTokens, finishReason]
+    ChatSettings:
+      type: object
+      properties:
+        temperature:
+          type: number
+        topP:
+          type: number
+        maxOutputTokens:
+          type: integer
+      required: [temperature, topP, maxOutputTokens]
+    ChatResponse:
+      type: object
+      properties:
+        reply:
+          type: string
+        usage:
+          $ref: "#/components/schemas/ChatUsage"
+        settings:
+          $ref: "#/components/schemas/ChatSettings"
+        model:
+          type: string
+        truncated:
+          type: boolean
+      required: [reply, usage, settings, model, truncated]
+    SystemPromptResponse:
+      type: object
+      properties:
+        systemPrompt:
+          type: string
+      required: [systemPrompt]
 
