@@ -202,7 +202,8 @@ if (dishForm) {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || result.reason || "Upload failed.");
+        const detail = result.reason ? ` ${result.reason}` : "";
+        throw new Error(`${result.error || "Upload failed."}${detail}`);
       }
 
       // Prepend to top of gallery

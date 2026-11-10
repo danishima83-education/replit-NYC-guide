@@ -1,7 +1,9 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
-import { db, dishPhotosTable, type DishPhoto } from "@workspace/db";
+import { db, dishPhotosTable } from "@workspace/db";
 import { desc, eq } from "drizzle-orm";
+import { inspectDishPhoto } from "../agents/dishInspector";
+import { city } from "../city";
 
 const router: IRouter = Router();
 
@@ -29,7 +31,7 @@ let nextLocalId = 1;
 
 /**
  * POST /api/dishes
- * Upload a dish photo.
+ * Upload a dish photo, inspect with LangChain ChatGoogle agent, and persist if approved.
  */
 router.post("/dishes", async (req: Request, res: Response): Promise<void> => {
   const parsed = createDishSchema.safeParse(req.body);
@@ -69,6 +71,39 @@ router.post("/dishes", async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    res.status(503).json({
+      error: "Add a GEMINI_API_KEY secret to enable the dish inspector.",
+    });
+    return;
+  }
+
+  // Feature 3: Evaluate photo with LangChain Dish Inspector Agent
+  let inspection;
+  try {
+    inspection = await inspectDishPhoto({
+      mimeType,
+      imageBase64: base64Data,
+      apiKey,
+    });
+  } catch (inspectorErr) {
+    req.log.error({ inspectorErr }, "Dish inspector agent failed");
+    res.status(502).json({
+      error: "The dish inspector could not evaluate your photo right now. Please try again.",
+    });
+    return;
+  }
+
+  // Enforce approval rule: isMatch === true AND confidence >= 0.7
+  if (!inspection.approved) {
+    res.status(422).json({
+      error: `Only ${city.dish} photos can be uploaded!`,
+      reason: inspection.rejectionReason || `The inspector saw: ${inspection.whatISee}`,
+    });
+    return;
+  }
+
   try {
     let saved: { id: number; title: string; caption: string; inspectorNote: string | null; createdAt: Date };
 
@@ -80,7 +115,7 @@ router.post("/dishes", async (req: Request, res: Response): Promise<void> => {
           caption,
           mimeType,
           imageBase64: base64Data,
-          inspectorNote: null,
+          inspectorNote: inspection.inspectorNote,
         })
         .returning();
 
@@ -100,7 +135,7 @@ router.post("/dishes", async (req: Request, res: Response): Promise<void> => {
         caption,
         mimeType,
         imageBase64: base64Data,
-        inspectorNote: null,
+        inspectorNote: inspection.inspectorNote,
         createdAt: new Date(),
       };
       inMemoryDishes.unshift(item);
