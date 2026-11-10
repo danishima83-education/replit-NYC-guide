@@ -45,7 +45,8 @@ export const citySettings = {
   defaultTemperature: 1,
   defaultTopP: 0.95,
   defaultMaxOutputTokens: 300,
-  defaultModel: "gemini-3.5-flash",
+  defaultModel: "gemini-3.5-flash-lite",
+  cascadeModels: ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"] as const,
 } as const;
 
 export const cityFacts = city.appFacts;

@@ -56,10 +56,23 @@ router.post("/chat", async (req, res): Promise<void> => {
   };
 
   const history = parsed.data.history ?? [];
-  const model = process.env.GEMINI_MODEL?.trim() || citySettings.defaultModel;
+  const candidateModels = process.env.GEMINI_MODEL?.trim()
+    ? [process.env.GEMINI_MODEL.trim()]
+    : [...citySettings.cascadeModels];
 
   try {
     const gemini = new GoogleGenAI({ apiKey });
+
+    const contents = [
+      ...history.map((item) => ({
+        role: item.role === "assistant" ? "model" : "user",
+        parts: [{ text: item.content.slice(0, maximumMessageLength) }],
+      })),
+      {
+        role: "user",
+        parts: [{ text: message }],
+      },
+    ];
 
     let reply = "";
     let promptTokens = 0;
@@ -67,92 +80,50 @@ router.post("/chat", async (req, res): Promise<void> => {
     let totalTokens = 0;
     let finishReason: string | null = null;
     let truncated = false;
+    let modelUsed = "";
+    let lastError: unknown = null;
 
-    // Strategy 1: Standard canonical generateContent API
-    try {
-      const contents = [
-        ...history.map((item) => ({
-          role: item.role === "assistant" ? "model" : "user",
-          parts: [{ text: item.content.slice(0, maximumMessageLength) }],
-        })),
-        {
-          role: "user",
-          parts: [{ text: message }],
-        },
-      ];
-
-      const result = await gemini.models.generateContent({
-        model,
-        contents,
-        config: {
+    for (const model of candidateModels) {
+      try {
+        const isThinkingModel = !model.includes("-lite");
+        const config: Record<string, unknown> = {
           systemInstruction: cityGuideSystemPrompt,
           temperature: settings.temperature,
           topP: settings.topP,
           maxOutputTokens: settings.maxOutputTokens,
-          thinkingConfig: {
-            thinkingBudget: 0,
-          },
-        },
-      });
+        };
+        if (isThinkingModel) {
+          config.thinkingConfig = { thinkingBudget: 0 };
+        }
 
-      reply =
-        result.text?.trim() ||
-        "I’m not sure about that one. I can help with New York food, landmarks, or getting around.";
-      promptTokens = result.usageMetadata?.promptTokenCount ?? 0;
-      outputTokens = result.usageMetadata?.candidatesTokenCount ?? 0;
-      totalTokens = result.usageMetadata?.totalTokenCount ?? promptTokens + outputTokens;
-      finishReason = result.candidates?.[0]?.finishReason ?? (outputTokens >= settings.maxOutputTokens ? "MAX_TOKENS" : "STOP");
-      truncated = finishReason === "MAX_TOKENS" || outputTokens >= settings.maxOutputTokens;
-    } catch (genErr) {
-      req.log.warn({ genErr }, "Standard generateContent failed, falling back to interactions API");
-
-      // Strategy 2: Fallback to Interactions API if supported
-      const interactionInput = [
-        ...history.map((item) => ({
-          type: item.role === "assistant" ? ("model_output" as const) : ("user_input" as const),
-          content: [
-            {
-              type: "text" as const,
-              text: item.content.slice(0, maximumMessageLength),
-            },
-          ],
-        })),
-        {
-          type: "user_input" as const,
-          content: [{ type: "text" as const, text: message }],
-        },
-      ];
-
-      const result = await gemini.interactions.create(
-        {
+        const result = await gemini.models.generateContent({
           model,
-          input: interactionInput,
-          system_instruction: cityGuideSystemPrompt,
-          generation_config: {
-            temperature: settings.temperature,
-            top_p: settings.topP,
-            max_output_tokens: settings.maxOutputTokens,
-          },
-          store: false,
-        },
-        {
-          timeout_ms: 30_000,
-          retries: { strategy: "none" },
-          signal: AbortSignal.timeout(30_000),
-        },
-      );
+          contents,
+          config,
+        });
 
-      outputTokens = result.usage?.total_output_tokens ?? 0;
-      promptTokens = result.usage?.total_input_tokens ?? 0;
-      totalTokens = result.usage?.total_tokens ?? promptTokens + outputTokens;
-      truncated =
-        result.status === "incomplete" ||
-        result.status === "budget_exceeded" ||
-        outputTokens >= settings.maxOutputTokens;
-      finishReason = truncated ? "MAX_TOKENS" : result.status;
-      reply =
-        result.output_text?.trim() ||
-        "I’m not sure about that one. I can help with New York food, landmarks, or getting around.";
+        reply =
+          result.text?.trim() ||
+          "I’m not sure about that one. I can help with New York food, landmarks, or getting around.";
+        promptTokens = result.usageMetadata?.promptTokenCount ?? 0;
+        outputTokens = result.usageMetadata?.candidatesTokenCount ?? 0;
+        totalTokens = result.usageMetadata?.totalTokenCount ?? promptTokens + outputTokens;
+        finishReason = result.candidates?.[0]?.finishReason ?? (outputTokens >= settings.maxOutputTokens ? "MAX_TOKENS" : "STOP");
+        truncated = finishReason === "MAX_TOKENS" || outputTokens >= settings.maxOutputTokens;
+        modelUsed = model;
+        break;
+      } catch (err) {
+        req.log.warn({ err, model }, "Model in cascade failed, falling back to next candidate");
+        lastError = err;
+      }
+    }
+
+    if (!modelUsed) {
+      req.log.error({ lastError }, "All models in cascade failed");
+      res.status(502).json({
+        error: "The city guide could not answer right now. Please try again shortly.",
+      });
+      return;
     }
 
     const response = SendChatMessageResponse.parse({
@@ -164,7 +135,7 @@ router.post("/chat", async (req, res): Promise<void> => {
         finishReason,
       },
       settings,
-      model,
+      model: modelUsed,
       truncated,
     });
 
