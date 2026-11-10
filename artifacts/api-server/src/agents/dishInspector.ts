@@ -53,7 +53,7 @@ export async function inspectDishPhoto(params: {
   imageBase64: string;
   apiKey: string;
 }): Promise<InspectionResult> {
-  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash";
 
   const llm = new ChatGoogle({
     apiKey: params.apiKey,

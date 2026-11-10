@@ -89,6 +89,9 @@ router.post("/chat", async (req, res): Promise<void> => {
           temperature: settings.temperature,
           topP: settings.topP,
           maxOutputTokens: settings.maxOutputTokens,
+          thinkingConfig: {
+            thinkingBudget: 0,
+          },
         },
       });
 

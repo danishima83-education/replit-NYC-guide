@@ -45,7 +45,7 @@ export const citySettings = {
   defaultTemperature: 1,
   defaultTopP: 0.95,
   defaultMaxOutputTokens: 300,
-  defaultModel: "gemini-2.5-flash",
+  defaultModel: "gemini-3.5-flash",
 } as const;
 
 export const cityFacts = city.appFacts;
