@@ -56,63 +56,109 @@ router.post("/chat", async (req, res): Promise<void> => {
   };
 
   const history = parsed.data.history ?? [];
-  const interactionInput = [
-    ...history.map((item) => ({
-      type: item.role === "assistant" ? ("model_output" as const) : ("user_input" as const),
-      content: [
-        {
-          type: "text" as const,
-          text: item.content.slice(0, maximumMessageLength),
-        },
-      ],
-    })),
-    {
-      type: "user_input" as const,
-      content: [{ type: "text" as const, text: message }],
-    },
-  ];
-
   const model = process.env.GEMINI_MODEL?.trim() || citySettings.defaultModel;
 
   try {
     const gemini = new GoogleGenAI({ apiKey });
-    const result = await gemini.interactions.create(
-      {
-        model,
-        input: interactionInput,
-        system_instruction: cityGuideSystemPrompt,
-        generation_config: {
-          temperature: settings.temperature,
-          top_p: settings.topP,
-          max_output_tokens: settings.maxOutputTokens,
-        },
-        store: false,
-      },
-      {
-        timeout_ms: 30_000,
-        retries: { strategy: "none" },
-        signal: AbortSignal.timeout(30_000),
-      },
-    );
 
-    const outputTokens = result.usage?.total_output_tokens ?? 0;
-    const truncated =
-      result.status === "incomplete" ||
-      result.status === "budget_exceeded" ||
-      outputTokens >= settings.maxOutputTokens;
-    if (result.status === "failed" || result.status === "cancelled") {
-      throw new Error(`Gemini interaction ended with status: ${result.status}`);
+    let reply = "";
+    let promptTokens = 0;
+    let outputTokens = 0;
+    let totalTokens = 0;
+    let finishReason: string | null = null;
+    let truncated = false;
+
+    // Strategy 1: Standard canonical generateContent API
+    try {
+      const contents = [
+        ...history.map((item) => ({
+          role: item.role === "assistant" ? "model" : "user",
+          parts: [{ text: item.content.slice(0, maximumMessageLength) }],
+        })),
+        {
+          role: "user",
+          parts: [{ text: message }],
+        },
+      ];
+
+      const result = await gemini.models.generateContent({
+        model,
+        contents,
+        config: {
+          systemInstruction: cityGuideSystemPrompt,
+          temperature: settings.temperature,
+          topP: settings.topP,
+          maxOutputTokens: settings.maxOutputTokens,
+        },
+      });
+
+      reply =
+        result.text?.trim() ||
+        "I’m not sure about that one. I can help with New York food, landmarks, or getting around.";
+      promptTokens = result.usageMetadata?.promptTokenCount ?? 0;
+      outputTokens = result.usageMetadata?.candidatesTokenCount ?? 0;
+      totalTokens = result.usageMetadata?.totalTokenCount ?? promptTokens + outputTokens;
+      finishReason = result.candidates?.[0]?.finishReason ?? (outputTokens >= settings.maxOutputTokens ? "MAX_TOKENS" : "STOP");
+      truncated = finishReason === "MAX_TOKENS" || outputTokens >= settings.maxOutputTokens;
+    } catch (genErr) {
+      req.log.warn({ genErr }, "Standard generateContent failed, falling back to interactions API");
+
+      // Strategy 2: Fallback to Interactions API if supported
+      const interactionInput = [
+        ...history.map((item) => ({
+          type: item.role === "assistant" ? ("model_output" as const) : ("user_input" as const),
+          content: [
+            {
+              type: "text" as const,
+              text: item.content.slice(0, maximumMessageLength),
+            },
+          ],
+        })),
+        {
+          type: "user_input" as const,
+          content: [{ type: "text" as const, text: message }],
+        },
+      ];
+
+      const result = await gemini.interactions.create(
+        {
+          model,
+          input: interactionInput,
+          system_instruction: cityGuideSystemPrompt,
+          generation_config: {
+            temperature: settings.temperature,
+            top_p: settings.topP,
+            max_output_tokens: settings.maxOutputTokens,
+          },
+          store: false,
+        },
+        {
+          timeout_ms: 30_000,
+          retries: { strategy: "none" },
+          signal: AbortSignal.timeout(30_000),
+        },
+      );
+
+      outputTokens = result.usage?.total_output_tokens ?? 0;
+      promptTokens = result.usage?.total_input_tokens ?? 0;
+      totalTokens = result.usage?.total_tokens ?? promptTokens + outputTokens;
+      truncated =
+        result.status === "incomplete" ||
+        result.status === "budget_exceeded" ||
+        outputTokens >= settings.maxOutputTokens;
+      finishReason = truncated ? "MAX_TOKENS" : result.status;
+      reply =
+        result.output_text?.trim() ||
+        "I’m not sure about that one. I can help with New York food, landmarks, or getting around.";
     }
 
     const response = SendChatMessageResponse.parse({
-      reply:
-        result.output_text?.trim() ||
-        "I’m not sure about that one. I can help with New York food, landmarks, or getting around.",
+      reply,
       usage: {
-        promptTokens: result.usage?.total_input_tokens ?? 0,
+        promptTokens,
         outputTokens,
-        totalTokens: result.usage?.total_tokens ?? 0,
-        finishReason: truncated ? "MAX_TOKENS" : result.status,
+        totalTokens,
+        finishReason,
       },
       settings,
       model,
