@@ -18,6 +18,7 @@
     />
     <link rel="stylesheet" href="style.css" />
     <script src="script.js" defer></script>
+    <script src="dishGallery.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to the guide</a>
@@ -28,6 +29,7 @@
       </a>
       <nav class="top-nav" aria-label="Main navigation">
         <a href="#taste">Taste</a>
+        <a href="#gallery">Slice Gallery</a>
         <a href="#know">Know</a>
         <a href="#chat">Ask a local</a>
         <a href="#favorites">Your list</a>
@@ -121,6 +123,75 @@
             <span class="scribble" aria-hidden="true">one more?</span>
           </div>
         </article>
+      </section>
+
+      <!-- Favorite Dish Gallery (Feature 2) -->
+      <section class="dish-gallery-section" id="gallery" aria-labelledby="gallery-title">
+        <div class="gallery-heading">
+          <p class="eyebrow"><span class="section-number">01.B</span> COMMUNITY SLICE GALLERY</p>
+          <h2 id="gallery-title">The city’s best slices,<br /><em>captured by you.</em></h2>
+          <p class="section-deck">
+            Upload your favorite New York-style pizza slice. Real slices only: wide, thin, and ready to fold.
+          </p>
+        </div>
+
+        <div class="dish-upload-card">
+          <div class="dish-card-topline">
+            <span>NYC FIELD NOTES</span>
+            <span>PIZZA UPLOAD</span>
+          </div>
+          <form id="dish-upload-form" class="dish-form">
+            <div class="dish-form-fields">
+              <div class="form-group">
+                <label for="dish-title">Where is this slice from? *</label>
+                <input
+                  id="dish-title"
+                  name="title"
+                  type="text"
+                  placeholder="e.g. Joe's Pizza on Carmine St"
+                  maxlength="120"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="dish-caption">Notes (optional)</label>
+                <input
+                  id="dish-caption"
+                  name="caption"
+                  type="text"
+                  placeholder="e.g. Perfect crisp crust, folded hot on a paper plate"
+                  maxlength="300"
+                />
+              </div>
+              <div class="form-group">
+                <label for="dish-file">Photo of the slice (JPEG, PNG, WebP) *</label>
+                <input
+                  id="dish-file"
+                  name="file"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  required
+                />
+              </div>
+            </div>
+            <div class="dish-form-actions">
+              <button id="dish-submit" type="submit" class="dish-submit-button">
+                Add to Gallery <span aria-hidden="true">+</span>
+              </button>
+              <p id="dish-upload-status" class="dish-status" aria-live="polite">
+                Photos are resized in the browser to 1280px before uploading.
+              </p>
+            </div>
+          </form>
+        </div>
+
+        <div class="dish-grid-container">
+          <div id="dish-gallery-empty" class="dish-empty-state">
+            <span class="empty-mark" aria-hidden="true">🍕</span>
+            <p>No slice photos shared yet. Be the first to add your favorite New York slice!</p>
+          </div>
+          <div id="dish-gallery-grid" class="dish-cards-grid" aria-live="polite"></div>
+        </div>
       </section>
 
       <section class="city-facts" id="know" aria-labelledby="facts-title">
