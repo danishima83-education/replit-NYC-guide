@@ -27,17 +27,27 @@ const trackDownloadSchema = z.object({
 });
 
 /**
+ * Helper to retrieve Unsplash Access Key supporting both spec name and user-configured secret names
+ */
+const getUnsplashAccessKey = (): string | undefined => {
+  return (
+    process.env.UNSPLASH_API_KEY?.trim() ||
+    process.env.UNSPLASH_ACCESS_KEY?.trim()
+  );
+};
+
+/**
  * GET /api/unsplash/dish-inspiration
  * Dynamically fetches real-world food inspiration photos using Unsplash API
  * based on the city's favorite dish configured in Part A.
  */
 router.get("/unsplash/dish-inspiration", async (req: Request, res: Response): Promise<void> => {
-  const apiKey = process.env.UNSPLASH_ACCESS_KEY?.trim();
+  const apiKey = getUnsplashAccessKey();
 
   // Requirement 1 & Acceptance Test 3: If key is missing, return 503 with friendly message
   if (!apiKey) {
     res.status(503).json({
-      error: "Add an UNSPLASH_ACCESS_KEY secret to enable the dish inspiration explorer.",
+      error: "Add an UNSPLASH_API_KEY or UNSPLASH_ACCESS_KEY secret to enable the dish inspiration explorer.",
     });
     return;
   }
@@ -52,64 +62,68 @@ router.get("/unsplash/dish-inspiration", async (req: Request, res: Response): Pr
   const page = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
   const perPage = 6;
 
-  const searchUrl = new URL(UNSPLASH_SEARCH_ENDPOINT);
-  searchUrl.searchParams.set("query", userQuery);
-  searchUrl.searchParams.set("per_page", String(perPage));
-  searchUrl.searchParams.set("page", String(page));
-  searchUrl.searchParams.set("orientation", "landscape");
+  // Search candidate queries: user query, and normalized query (e.g. "New York-style pizza" -> "New York pizza")
+  const searchQueries = [userQuery];
+  const cleanedQuery = userQuery.replace(/-style/gi, "").replace(/\s+/g, " ").trim();
+  if (cleanedQuery !== userQuery) {
+    searchQueries.push(cleanedQuery);
+  }
+  searchQueries.push("pizza slice");
 
   try {
-    const unsplashRes = await fetch(searchUrl.toString(), {
-      method: "GET",
-      headers: {
-        Authorization: `Client-ID ${apiKey}`,
-        "Accept-Version": "v1",
-      },
-    });
+    let results: Array<{
+      id: string;
+      urls?: { raw?: string; regular?: string; small?: string };
+      alt_description?: string;
+      description?: string;
+      user?: { name?: string; links?: { html?: string } };
+      links?: { download_location?: string };
+    }> = [];
 
-    if (!unsplashRes.ok) {
-      const errorBody = await unsplashRes.text().catch(() => "");
-      req.log.warn(
-        { status: unsplashRes.status, errorBody },
-        "Unsplash search API returned non-OK status",
-      );
+    for (const term of searchQueries) {
+      const searchUrl = new URL(UNSPLASH_SEARCH_ENDPOINT);
+      searchUrl.searchParams.set("query", term);
+      searchUrl.searchParams.set("per_page", String(perPage));
+      searchUrl.searchParams.set("page", String(page));
+      searchUrl.searchParams.set("orientation", "landscape");
 
-      if (unsplashRes.status === 401) {
+      const unsplashRes = await fetch(searchUrl.toString(), {
+        method: "GET",
+        headers: {
+          Authorization: `Client-ID ${apiKey}`,
+          "Accept-Version": "v1",
+        },
+      });
+
+      if (!unsplashRes.ok) {
+        const errorBody = await unsplashRes.text().catch(() => "");
+        req.log.warn(
+          { status: unsplashRes.status, errorBody, term },
+          "Unsplash search API returned non-OK status",
+        );
+
+        if (unsplashRes.status === 401) {
+          res.status(502).json({
+            error: "Invalid UNSPLASH_API_KEY provided. Please check your Unsplash credentials.",
+          });
+          return;
+        }
+
         res.status(502).json({
-          error: "Invalid UNSPLASH_ACCESS_KEY provided. Please check your Unsplash credentials.",
+          error: "Could not fetch inspiration photos from Unsplash right now. Please try again.",
         });
         return;
       }
 
-      res.status(502).json({
-        error: "Could not fetch inspiration photos from Unsplash right now. Please try again.",
-      });
-      return;
+      const data = await unsplashRes.json() as {
+        results?: typeof results;
+      };
+
+      if (data.results && data.results.length > 0) {
+        results = data.results;
+        break;
+      }
     }
-
-    const data = await unsplashRes.json() as {
-      results?: Array<{
-        id: string;
-        urls?: {
-          raw?: string;
-          regular?: string;
-          small?: string;
-        };
-        alt_description?: string;
-        description?: string;
-        user?: {
-          name?: string;
-          links?: {
-            html?: string;
-          };
-        };
-        links?: {
-          download_location?: string;
-        };
-      }>;
-    };
-
-    const results = data.results || [];
 
     // Requirement 4: Return clean array of up to 6 photos with exact contract
     const photos: InspirationPhoto[] = results.slice(0, 6).map((item) => {
@@ -143,9 +157,9 @@ router.get("/unsplash/dish-inspiration", async (req: Request, res: Response): Pr
  * or save an image to comply with Unsplash API guidelines.
  */
 router.post("/unsplash/track-download", async (req: Request, res: Response): Promise<void> => {
-  const apiKey = process.env.UNSPLASH_ACCESS_KEY?.trim();
+  const apiKey = getUnsplashAccessKey();
   if (!apiKey) {
-    res.status(503).json({ error: "UNSPLASH_ACCESS_KEY not configured." });
+    res.status(503).json({ error: "UNSPLASH_API_KEY not configured." });
     return;
   }
 
