@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="style.css" />
     <script type="module" src="/script.js"></script>
     <script type="module" src="/dishGallery.js"></script>
+    <script type="module" src="/unsplashInspiration.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to the guide</a>
@@ -30,6 +31,7 @@
       <nav class="top-nav" aria-label="Main navigation">
         <a href="#taste">Taste</a>
         <a href="#gallery">Slice Gallery</a>
+        <a href="#inspiration">Inspiration</a>
         <a href="#know">Know</a>
         <a href="#chat">Ask a local</a>
         <a href="#favorites">Your list</a>
@@ -191,6 +193,34 @@
             <p>No slice photos shared yet. Be the first to add your favorite New York slice!</p>
           </div>
           <div id="dish-gallery-grid" class="dish-cards-grid" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <!-- Feature 4: Unsplash Food Explorer (Inspiration Grid) -->
+      <section class="dish-gallery-section dish-inspiration-section" id="inspiration" aria-labelledby="inspiration-title">
+        <div class="gallery-heading">
+          <p class="eyebrow"><span class="section-number">01.C</span> FOOD INSPIRATION</p>
+          <h2 id="inspiration-title">Real-world slices,<br /><em>curated from Unsplash.</em></h2>
+          <p class="section-deck">
+            High-resolution photography of authentic New York-style pizza, fetched live via the Unsplash API.
+          </p>
+        </div>
+
+        <div class="inspiration-toolbar">
+          <button id="refresh-inspiration-btn" class="dish-submit-button inspiration-refresh-btn" type="button">
+            Refresh Inspiration <span aria-hidden="true">↻</span>
+          </button>
+          <span class="unsplash-attribution-tag">
+            Photos provided by <a href="https://unsplash.com/?utm_source=nyc_city_guide&utm_medium=referral" target="_blank" rel="noopener noreferrer">Unsplash</a>
+          </span>
+        </div>
+
+        <div class="dish-grid-container">
+          <div id="inspiration-empty" class="dish-empty-state">
+            <span class="empty-mark" aria-hidden="true">📸</span>
+            <p id="inspiration-empty-message">Add an <code>UNSPLASH_ACCESS_KEY</code> secret to enable the dish inspiration explorer.</p>
+          </div>
+          <div id="inspiration-grid" class="dish-cards-grid" aria-live="polite"></div>
         </div>
       </section>
 
